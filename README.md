@@ -53,7 +53,7 @@ used value, the process will block while executing key eviction policies (as def
 
 If you are working with a large dataset in production and need to migrate it elsewhere, then
 being able to shrink the maxmemory value without blocking all work for several seconds (in
-our case lowering the value by `256 MB` or `268435456` bytes on an m2.2xlarge machine with a
+our case lowering the value by `256 MB` or `268435456` bytes on an m2.4xlarge machine with a
 redis dataset of 45GB in memory, took around 3-5 seconds).
 
 `rslide` is intended as a tool which allows you to lower the maxmemory much more gradually,

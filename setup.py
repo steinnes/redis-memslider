@@ -1,5 +1,6 @@
 from setuptools import setup
 from pip.req import parse_requirements
+from pip.download import PipSession
 
 setup(
     name='redis-memslider',
@@ -11,7 +12,7 @@ setup(
                 'm2.2xlarge instance takes in the vicinity of 1-5 seconds to evict 256MB of keys.',
     py_modules=['slider'],
     install_requires=[
-        str(req.req) for req in parse_requirements("requirements.txt")
+        str(req.req) for req in parse_requirements("requirements.txt", session=PipSession())
     ],
     entry_points='''
         [console_scripts]

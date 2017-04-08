@@ -1,20 +1,33 @@
-redis-memslider
----------------
+## rslide
 
-`rslide` is a tool to gradually lower redis maxmemory settings.  This is useful when for ex.
-when reducing the amount of volatile data in a redis database with a mixed keyspace (ie. not
-all data is volatile) before slaving or migrating the data somewhere else.
+`rslide` is a tool to gradually lower the [Redis](https://redis.io)
+maxmemory directive.
 
+Redis is single threaded and lowering the maximum memory below the used
+level will cause the database to enter a blocking eviction loop until the
+database fits within the new maxmemory value.
 
-Setup
------
+This is useful when for ex.  when reducing the amount of volatile data in
+a redis database with a mixed keyspace (ie. not all data is volatile)
+before slaving or migrating the data somewhere else.
 
+## Setup
+
+### from PyPI
+
+    $ pip install redis-memslider
+    $ rslide ...
+
+### from source
+
+    $ git clone git@github.com:steinnes/redis-memslider.git
+    $ cd redis-memslider
     $ make
     $ rslide ...
 
 
-Example usage/output:
----------------------
+## Example usage/output:
+
     $ rslide -r 1073741824 -s 20 -i 1
     About to reduce maxmemory from 4294967296 -> 3221225472 in 20 steps of 53687091, with 1s intervals, continue? [Y/n]
     Setting maxmemory to 4241280205: took 0.000387191772461s
@@ -39,23 +52,11 @@ Example usage/output:
     Setting maxmemory to 3221225476: took 0.000394821166992s
     Setting maxmemory to 3167538385: took 0.000474214553833s
 
-Note how `rslide` actually performs 21 steps, but the second-to-last value is 4 bytes above the
-target of 3221225472.  This is because `rslide` will continue until the new maxmemory setting is
-below or equal to the target.
+Note how `rslide` actually performs 21 steps, but the second-to-last value
+is 4 bytes above the target of 3221225472.  This is because `rslide` will
+continue until the new maxmemory setting is below or equal to the target.
 
 
-Reasoning
----------
+## Background
 
-When you call `config set maxmemory ...` in redis and the new value is lower than the currently
-used value, the process will block while executing key eviction policies (as defined by your
-`maxmemory-policy`) until the used memory is less than the new `maxmemory` value.
-
-If you are working with a large dataset in production and need to migrate it elsewhere, then
-being able to shrink the maxmemory value without blocking all work for several seconds (in
-our case lowering the value by `256 MB` or `268435456` bytes on an m2.4xlarge machine with a
-redis dataset of 45GB in memory, took around 3-5 seconds).
-
-`rslide` is intended as a tool which allows you to lower the maxmemory much more gradually,
-causing less harm to production systems.
-
+[Changing redis maxmemory gradually](https://steinn.org/post/redis-gradual-maxmemory/)
